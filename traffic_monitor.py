@@ -13,10 +13,15 @@ def process_packet(packet):
     if IP in packet:
         # NEW: Safely extract TCP flags if the packet uses TCP
         tcp_flags = packet[TCP].flags if TCP in packet else ""
-        
+        dst_port = 0
+        if packet.haslayer(TCP):
+            dst_port = packet[TCP].dport
+        elif packet.haslayer(UDP):
+            dst_port = packet[UDP].dport
         packet_buffer.append({
             'src_ip': packet[IP].src,
             'length': len(packet),
+            'dst_port': dst_port,
             'protocol': packet[IP].proto,
             'tcp_flags': str(tcp_flags)  # NEW: Add flags to the buffer
         })

@@ -6,6 +6,7 @@ import subprocess
 import threading
 import atexit
 from PIL import Image, ImageTk
+import defense
 
 class IDS_Dashboard(tk.Tk):
     def __init__(self):
@@ -69,6 +70,32 @@ class IDS_Dashboard(tk.Tk):
         self.image_label = ttk.Label(self)
         self.image_label.pack(pady=20, fill=tk.BOTH, expand=True)
 
+        btn_frame = ttk.Frame(self)
+        btn_frame.pack(fill=tk.X, padx=20, pady=5)
+        
+        self.unblock_btn = ttk.Button(
+            btn_frame, 
+            text=" Reset Firewall (Unblock All IPs)", 
+            command=self.reset_firewall
+        )
+        self.unblock_btn.pack(side=tk.RIGHT)
+
+    def reset_firewall(self):
+        """Calls the defense script to remove all IDS firewall rules."""
+        try:
+            # Call the function from defense.py
+            defense.unblock_all()
+            
+            # Show a success popup
+            messagebox.showinfo("Firewall Reset", "All IDS blocking rules have been removed from Windows Firewall.")
+            
+            # Update the dashboard status
+            self.status_var.set("Status:  Firewall Reset. Traffic unblocked.")
+            self.status_label.config(foreground="green")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to reset firewall: {e}\n\nMake sure you are running the app as Administrator.")
+    
     def check_alerts(self):
         alert_path = "outputs/alerts.csv"
         shap_image_path = "outputs/shap_latest_alert.png"
@@ -102,7 +129,7 @@ class IDS_Dashboard(tk.Tk):
             except Exception:
                 pass 
         else:
-            self.status_var.set("Status: ✅ Secure (Sniffing Network...)")
+            self.status_var.set("Status: Secure (Sniffing Network...)")
             self.status_label.config(foreground="green")
             
             for item in self.tree.get_children():

@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 
 def generate_shap_plot(model, traffic_features, feature_names, save_path="outputs/shap_latest_alert.png"):
     # 1. Initialize the explainer (Using KernelExplainer or DeepExplainer depending on your DNN)
-    # Note: We use a placeholder background dataset here; in production, 
-    # you'd pass a sample of normal training data.
     explainer = shap.KernelExplainer(model.predict, shap.sample(traffic_features, 10))
     
     # 2. Calculate SHAP values for the specific anomalous packet window
